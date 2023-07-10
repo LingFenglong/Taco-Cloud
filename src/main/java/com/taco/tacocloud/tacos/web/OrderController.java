@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -14,9 +13,9 @@ import org.springframework.web.bind.support.SessionStatus;
 @Slf4j
 @Controller
 @RequestMapping("/orders")
-@SessionAttributes("orders")
+@SessionAttributes("order")
 public class OrderController {
-    private JdbcOrderRepository orderRepo;
+    private final JdbcOrderRepository orderRepo;
 
     @Autowired
     public OrderController(JdbcOrderRepository jdbcOrderRepo) {
@@ -24,20 +23,21 @@ public class OrderController {
     }
 
     @GetMapping("/current")
-    public String orderForm(Model model) {
+    public String orderForm() {
         return "orderForm";
     }
 
     @PostMapping
-    public String processOrder(@Valid Order order, Errors errors, SessionStatus sessionStatus) {
+    public String processOrder(@Valid @ModelAttribute("order") Order order, Errors errors, SessionStatus sessionStatus) {
         if (errors.hasErrors()) {
             log.error(errors.toString());
-            return "orderForm";
+            return "/orderForm";
         }
 
         orderRepo.save(order);
         sessionStatus.setComplete();
-        log.info("Order submitted: " + order);
+        log.info(order.toString());
+
         return "redirect:/";
     }
 }

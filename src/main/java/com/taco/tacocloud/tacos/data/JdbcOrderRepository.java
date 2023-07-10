@@ -32,7 +32,7 @@ public class JdbcOrderRepository implements OrderRepository{
         Long orderId = saveOrderDetails(order);
         order.setId(orderId);
 
-        List<Taco> tacos = new ArrayList<>();
+        List<Taco> tacos = order.getTacos();
         for (Taco taco : tacos) {
             saveTacoToOrder(taco, orderId);
         }
